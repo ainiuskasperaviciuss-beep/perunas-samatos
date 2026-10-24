@@ -1,0 +1,10 @@
+{
+  "name": "MB PERUNAS Sąmatos",
+  "short_name": "PERUNAS",
+  "description": "Elektros darbų sąmatų skaičiuoklė",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#172c46",
+  "icons": []
+}

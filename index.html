@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#172c46">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PERUNAS Sąmatos">
+<link rel="manifest" href="manifest.json">
+<title>MB PERUNAS · Sąmatos</title>
+<style>
+:root{--navy:#172c46;--gold:#f5c451;--bg:#f3f5f8;--card:#fff;--text:#172334;--muted:#657286;--line:#e0e5ec;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:28px}
+header{background:var(--navy);color:white;padding:20px 16px 18px;border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:12px;background:#263f5e;display:grid;place-items:center;color:var(--gold);font-size:25px;font-weight:800}.brand h1{font-size:19px;margin:0;letter-spacing:1px}.brand p{font-size:12px;margin:4px 0 0;color:#d6deea}
+main{max-width:720px;margin:auto;padding:14px;display:grid;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 2px 8px #172c4608}
+h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:650;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #cfd7e2;border-radius:10px;padding:11px 10px;font:inherit;font-size:16px;background:white;color:var(--text);min-width:0}textarea{min-height:75px;resize:vertical}.items{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px}.itemtop{display:flex;align-items:center;justify-content:space-between;gap:8px}.itemname{flex:1}.itemfields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.itemtotal{display:flex;justify-content:space-between;align-items:center;font-size:14px}.btn{border:0;border-radius:11px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}.primary{background:var(--navy);color:white}.secondary{background:#edf1f6;color:var(--navy)}.gold{background:var(--gold);color:#172334}.danger{background:#fff0ef;color:var(--danger);padding:8px 10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.totalbox{background:#f0f3f7;border-radius:12px;padding:14px;display:grid;gap:10px}.line{display:flex;justify-content:space-between;gap:10px;font-size:14px}.line span:first-child{color:var(--muted)}.grand{border-top:1px solid #d4dbe5;padding-top:12px;margin-top:2px}.grand strong{font-size:25px;color:var(--navy)}.small{font-size:12px;color:var(--muted);line-height:1.45}.savedlist{display:grid;gap:8px}.saved{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.saved button{white-space:nowrap}.pill{font-size:11px;background:#edf1f6;border-radius:99px;padding:4px 8px;color:var(--navy)}
+@media(min-width:600px){main{padding:20px}.itemfields{grid-template-columns:1.1fr .8fr .8fr 1fr}} 
+@media print{header,.no-print,.card.history{display:none!important}body{background:white;padding:0}main{display:block;padding:0}.card{box-shadow:none;border:0;padding:0;margin-bottom:16px}.item{break-inside:avoid}.item .danger{display:none}.totalbox{background:white;border:1px solid #ddd}.print-title{display:block!important}}
+.print-title{display:none}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">P</div><div><h1>MB PERUNAS</h1><p>Elektros darbų sąmatos</p></div></div></header>
+<main>
+<section class="card">
+<h2>1. Sąmatos informacija</h2>
+<div class="grid">
+<div class="field full"><label for="client">Klientas / įmonė</label><input id="client" placeholder="Kliento pavadinimas"></div>
+<div class="field full"><label for="project">Objektas / darbų pavadinimas</label><input id="project" value="Elektros instaliacijos darbai"></div>
+<div class="field"><label for="date">Data</label><input id="date" type="date"></div>
+<div class="field"><label for="quoteNo">Sąmatos Nr.</label><input id="quoteNo" placeholder="PER-001"></div>
+</div>
+</section>
+<section class="card">
+<div class="itemtop"><h2 style="margin:0">2. Darbai ir medžiagos</h2><span class="pill" id="itemCount">0 poz.</span></div>
+<p class="small">Įvesk kiekį ir vieneto kainą. Kiekviena pozicija automatiškai įtraukiama į sąmatą.</p>
+<div id="items" class="items"></div>
+<button class="btn secondary no-print" id="addWork" style="width:100%;margin-top:10px">＋ Pridėti darbą</button>
+<button class="btn secondary no-print" id="addMaterial" style="width:100%;margin-top:8px">＋ Pridėti medžiagą</button>
+</section>
+<section class="card">
+<h2>3. Papildomos sąlygos</h2>
+<div class="grid">
+<div class="field"><label for="travel">Kelionė (€)</label><input id="travel" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label for="callout">Iškvietimas (€)</label><input id="callout" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label for="markup">Antkainis (%)</label><input id="markup" type="number" min="0" step="1" value="15"></div>
+<div class="field"><label for="discount">Nuolaida (€)</label><input id="discount" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label for="vatMode">PVM statusas</label><select id="vatMode"><option value="yes">PVM mokėtojas</option><option value="no">Ne PVM mokėtojas</option></select></div>
+<div class="field"><label for="vatRate">PVM tarifas (%)</label><select id="vatRate"><option value="21">21%</option><option value="12">12%</option><option value="5">5%</option><option value="0">0%</option></select></div>
+<div class="field full"><label for="notes">Pastabos / sąlygos klientui</label><textarea id="notes" placeholder="Darbų terminas, garantija, medžiagų tiekimas..."></textarea></div>
+</div>
+</section>
+<section class="card">
+<h2>4. Sąmatos suvestinė</h2>
+<div class="totalbox" aria-live="polite">
+<div class="line"><span>Darbai</span><b id="laborSum">0,00 €</b></div>
+<div class="line"><span>Medžiagos</span><b id="materialSum">0,00 €</b></div>
+<div class="line"><span>Kelionė ir iškvietimas</span><b id="extraSum">0,00 €</b></div>
+<div class="line"><span>Antkainis</span><b id="markupSum">0,00 €</b></div>
+<div class="line"><span>Nuolaida</span><b id="discountSum">−0,00 €</b></div>
+<div class="line"><span>Suma be PVM</span><b id="netSum">0,00 €</b></div>
+<div class="line"><span id="vatLabel">PVM (21%)</span><b id="vatSum">0,00 €</b></div>
+<div class="line grand"><span><b>GALUTINĖ KAINA</b><br><span class="small">Klientui mokėti</span></span><strong id="grandSum">0,00 €</strong></div>
+</div>
+<p class="small">Skaičiavimas yra orientacinis. Patikrink PVM taikymą ir įsitikink, kad įtrauktos visos darbo sąnaudos, medžiagos ir mokesčiai.</p>
+<div class="actions no-print">
+<button class="btn primary" id="saveQuote">Išsaugoti sąmatą</button>
+<button class="btn gold" id="printQuote">Spausdinti / PDF</button>
+<button class="btn secondary" id="emailQuote">Siųsti el. paštu</button>
+<button class="btn secondary" id="newQuote">Nauja sąmata</button>
+<button class="btn secondary" id="exportData">Atsarginė kopija</button>
+</div>
+<p class="small no-print">PDF: pasirink „Spausdinti / PDF“, o spausdinimo lange rinkis „Save as PDF“. Atsarginės kopijos failą saugok saugioje vietoje.</p>
+</section>
+<section class="card history">
+<h2>5. Išsaugotos sąmatos šiame įrenginyje</h2>
+<div id="savedQuotes" class="savedlist"><p class="small">Sąmatų dar nėra.</p></div>
+<p class="small">Duomenys saugomi šios naršyklės vietinėje saugykloje. Išvalius naršyklės duomenis jie gali dingti. Reguliariai kurk atsarginę kopiją.</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const euro=n=>new Intl.NumberFormat('lt-LT',{style:'currency',currency:'EUR'}).format(Number.isFinite(n)?n:0);
+const num=id=>Math.max(0,Number($(id).value)||0);
+let items=[], nextId=1, currentSavedId=null;
+const today=new Date(); $('date').value=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function addItem(type='Darbas',name=''){
+ const item={id:nextId++,type,name,qty:'1',unit:type==='Darbas'?'val.':'vnt.',price:'0'};
+ items.push(item);renderItems();calculate();
+}
+function renderItems(){
+ $('items').innerHTML='';
+ items.forEach(it=>{
+  const el=document.createElement('div');el.className='item';el.dataset.id=it.id;
+  el.innerHTML=`<div class="itemtop"><span class="pill">${it.type}</span><button class="btn danger no-print" data-remove="${it.id}" aria-label="Pašalinti">Pašalinti</button></div>
+  <div class="field"><label>Pavadinimas</label><input data-key="name" value="${escapeAttr(it.name)}" placeholder="Darbų ar medžiagos pavadinimas"></div>
+  <div class="itemfields"><div class="field"><label>Kiekis</label><input data-key="qty" type="number" min="0" step=".01" value="${escapeAttr(it.qty)}"></div>
+  <div class="field"><label>Vienetas</label><input data-key="unit" value="${escapeAttr(it.unit)}"></div>
+  <div class="field"><label>Kaina / vnt. (€)</label><input data-key="price" type="number" min="0" step=".01" value="${escapeAttr(it.price)}"></div>
+  <div class="field"><label>Tipas</label><select data-key="type"><option ${it.type==='Darbas'?'selected':''}>Darbas</option><option ${it.type==='Medžiaga'?'selected':''}>Medžiaga</option></select></div></div>
+  <div class="itemtotal"><span class="small">Pozicijos suma</span><b data-total="${it.id}">${euro((Number(it.qty)||0)*(Number(it.price)||0))}</b></div>`;
+  $('items').appendChild(el);
+ });
+ $('itemCount').textContent=items.length+' poz.';
+}
+function escapeAttr(s){return String(s??'').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
+$('items').addEventListener('input',e=>{const el=e.target.closest('.item');if(!el)return;const it=items.find(x=>x.id===Number(el.dataset.id));if(!it)return;const k=e.target.dataset.key;if(k)it[k]=e.target.value;calculate();});
+$('items').addEventListener('change',e=>{const el=e.target.closest('.item');if(!el)return;const it=items.find(x=>x.id===Number(el.dataset.id));if(!it)return;const k=e.target.dataset.key;if(k)it[k]=e.target.value;calculate();});
+$('items').addEventListener('click',e=>{const id=e.target.dataset.remove;if(!id)return;items=items.filter(x=>x.id!==Number(id));renderItems();calculate();});
+$('addWork').onclick=()=>addItem('Darbas');
+$('addMaterial').onclick=()=>addItem('Medžiaga');
+['travel','callout','markup','discount','vatMode','vatRate'].forEach(id=>$(id).addEventListener('input',calculate));
+function totals(){
+ let labor=0,material=0;
+ for(const it of items){const amount=Math.max(0,Number(it.qty)||0)*Math.max(0,Number(it.price)||0);if(it.type==='Medžiaga')material+=amount;else labor+=amount;}
+ const extra=num('travel')+num('callout'),base=labor+material+extra,markup=base*num('markup')/100;
+ const discount=Math.min(base+markup,num('discount')),net=Math.max(0,base+markup-discount);
+ const vat=$('vatMode').value==='yes'?net*num('vatRate')/100:0;
+ return {labor,material,extra,markup,discount,net,vat,total:net+vat};
+}
+function calculate(){
+ const t=totals();
+ for(const [id,val] of [['laborSum',t.labor],['materialSum',t.material],['extraSum',t.extra],['markupSum',t.markup],['discountSum',-t.discount],['netSum',t.net],['vatSum',t.vat],['grandSum',t.total]])$(id).textContent=(id==='discountSum'?'−':'')+euro(Math.abs(val));
+ $('vatLabel').textContent='PVM ('+($('vatMode').value==='yes'?$('vatRate').value:0)+'%)';
+ items.forEach(it=>{const el=document.querySelector(`[data-total="${it.id}"]`);if(el)el.textContent=euro(Math.max(0,Number(it.qty)||0)*Math.max(0,Number(it.price)||0));});
+}
+function collect(){
+ return {id:currentSavedId||('q-'+Date.now()),date:$('date').value,quoteNo:$('quoteNo').value,client:$('client').value,project:$('project').value,items:items.map(x=>({...x})),travel:$('travel').value,callout:$('callout').value,markup:$('markup').value,discount:$('discount').value,vatMode:$('vatMode').value,vatRate:$('vatRate').value,notes:$('notes').value,totals:totals(),updatedAt:new Date().toISOString()};
+}
+function loadForm(q){
+ currentSavedId=q.id||null;
+ ['date','quoteNo','client','project','travel','callout','markup','discount','vatMode','vatRate','notes'].forEach(k=>{if(q[k]!==undefined)$(k).value=q[k]});
+ items=(q.items||[]).map(x=>({...x,id:nextId++}));renderItems();calculate();window.scrollTo({top:0,behavior:'smooth'});
+}
+function getSaved(){try{return JSON.parse(localStorage.getItem('perunas_quotes_v1')||'[]')}catch{return []}}
+function setSaved(qs){localStorage.setItem('perunas_quotes_v1',JSON.stringify(qs))}
+$('saveQuote').onclick=()=>{
+ const q=collect();if(!q.client.trim()&&!q.project.trim()){alert('Įvesk bent kliento arba projekto pavadinimą.');return;}
+ const qs=getSaved(),i=qs.findIndex(x=>x.id===q.id);if(i>=0)qs[i]=q;else qs.unshift(q);
+ setSaved(qs);currentSavedId=q.id;renderSaved();alert('Sąmata išsaugota šiame įrenginyje.');
+};
+function renderSaved(){
+ const qs=getSaved();$('savedQuotes').innerHTML='';
+ if(!qs.length){$('savedQuotes').innerHTML='<p class="small">Sąmatų dar nėra.</p>';return;}
+ qs.forEach(q=>{
+  const el=document.createElement('div');el.className='saved';
+  const info=document.createElement('div');info.style.minWidth='0';
+  const title=document.createElement('b');title.textContent=q.client||q.project||'Sąmata';
+  const sub=document.createElement('div');sub.className='small';sub.textContent=(q.date||'')+' · '+(q.project||'')+' · '+euro(q.totals?.total||0);
+  info.append(title,sub);
+  const actions=document.createElement('div');actions.style.display='flex';actions.style.gap='6px';
+  const open=document.createElement('button');open.className='btn secondary';open.textContent='Atidaryti';open.onclick=()=>loadForm(q);
+  const del=document.createElement('button');del.className='btn danger';del.textContent='×';del.setAttribute('aria-label','Ištrinti');del.onclick=()=>{if(confirm('Ištrinti šią sąmatą?')){setSaved(getSaved().filter(x=>x.id!==q.id));renderSaved();}};
+  actions.append(open,del);el.append(info,actions);$('savedQuotes').append(el);
+ });
+}
+$('printQuote').onclick=()=>window.print();
+
+$('emailQuote').onclick=()=>{
+ const q=collect(), t=q.totals;
+ const subject='MB PERUNAS sąmata'+(q.quoteNo?' Nr. '+q.quoteNo:'')+(q.project?' – '+q.project:'');
+ const lines=[
+  'MB PERUNAS — ELEKTROS DARBŲ SĄMATA',
+  'Data: '+(q.date||''),
+  'Sąmatos Nr.: '+(q.quoteNo||'Nenurodytas'),
+  'Klientas: '+(q.client||'Nenurodytas'),
+  'Objektas: '+(q.project||'Nenurodytas'),
+  '',
+  'POZICIJOS:',
+  ...q.items.map((it,i)=>(i+1)+'. '+it.type+': '+it.name+' — '+it.qty+' '+it.unit+' × '+euro(Number(it.price)||0)+' = '+euro((Number(it.qty)||0)*(Number(it.price)||0))),
+  '',
+  'Darbai: '+euro(t.labor),
+  'Medžiagos: '+euro(t.material),
+  'Kelionė ir iškvietimas: '+euro(t.extra),
+  'Antkainis: '+euro(t.markup),
+  'Nuolaida: '+euro(t.discount),
+  'Suma be PVM: '+euro(t.net),
+  'PVM ('+(q.vatMode==='yes'?q.vatRate:0)+'%): '+euro(t.vat),
+  'GALUTINĖ KAINA: '+euro(t.total),
+  '',
+  'Pastabos: '+(q.notes||'—'),
+  '',
+  'Parengta MB PERUNAS sąmatų programėle.'
+ ];
+ const mailto='mailto:info@perunas.eu?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(lines.join('\n'));
+ window.location.href=mailto;
+};
+
+$('newQuote').onclick=()=>{if(!confirm('Pradėti naują sąmatą? Pirmiausia išsaugok dabartinę, jei jos reikės.'))return;currentSavedId=null;$('client').value='';$('project').value='Elektros instaliacijos darbai';$('quoteNo').value='';$('travel').value='0';$('callout').value='0';$('markup').value='15';$('discount').value='0';$('notes').value='';items=[];addItem('Darbas');addItem('Medžiaga');};
+$('exportData').onclick=()=>{
+ const data={app:'MB PERUNAS Sąmatos',version:1,exportedAt:new Date().toISOString(),quotes:getSaved()};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='perunas-samatu-atsargine-kopija.json';a.click();URL.revokeObjectURL(url);
+};
+addItem('Darbas','Elektros instaliacijos darbai');addItem('Medžiaga','Montavimo medžiagos');renderSaved();calculate();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
